@@ -1,7 +1,9 @@
-# http.Handle
+# Handling HTTP Requests
+
+## http.Handle
 
 There are two main ways for handling incoming HTTP requests:
-## `http.Handle`
+### `http.Handle`
 This registers a handler to handle requests matching a pattern.
 ``` go
 func Handle(pattern string, handler Handler)
@@ -28,7 +30,7 @@ func main() {
 }
 ```
 
-## `http.HandleFunc`
+### `http.HandleFunc`
 This registers a function to handle requests matching a pattern.
 ``` go
 func HandleFunc(pattern string, handler func(ResponseWriter, *Request))
@@ -46,7 +48,7 @@ func main() {
 }
 ```
 
-# ServeMux
+## ServeMux
 HTTP Request Multiplexor
 
 It's responsible for taking the incoming URL of an incoming request, and matching it to the list of registered patterns, then calling hte handler which was registered with that pattern.
@@ -55,7 +57,7 @@ When trying to match the incoming URL, it will always try to find the best match
 
 For example, if we had the following registered handlers; `/hello/world`, `/hello/world/`, and then received a request `/hello/world/123`, this would be handled by the `/hello/world/`, as this is the closest match to the incoming URL.
 
-## `http.ListenAndServe`
+### `http.ListenAndServe`
 ``` go
 func ListenAndServe(addr string, handler Handler) error
 ```
@@ -82,15 +84,15 @@ Because `http.ListenAndServe` blocks, and only returns non-nil error objects, it
     log.Fatal(http.ListenAndServe(":5000", nil))
 ```
 
-## `http.ListenAndServeTLS`
+### `http.ListenAndServeTLS`
 ``` go
 func ListenAndServeTLS(addr, certFile, keyFile string, handler Handler) error
 ```
 
-# `encoding/json` package
+## `encoding/json` package
 Allows us to easily encode and decode our Go data types into JSON using the `Marshal` and `Unmarshal` functions.
 
-## `json.Marshal`
+### `json.Marshal`
 ``` go
 json.Marshal(v interface{}) ([]byte, error)
 ```
@@ -116,7 +118,7 @@ func main() {
 
 The `surname` field isn't exported, therefore isn't included in the resulting JSON.
 
-## `json.Unmarshal`
+### `json.Unmarshal`
 ``` go
 json.Unmarshal(data []byte, v interface{}) error
 ```
@@ -146,7 +148,7 @@ type foo struct {
 }
 ```
 
-# Request
+## Request
 
 `Request.Method`
 - string
@@ -158,7 +160,7 @@ type foo struct {
 - io.ReadCloser
 - Returns EOF when not present
 
-## `request.URL`
+### `request.URL`
 
 The `request.URL` is a struct that looks like this:
 ``` go
@@ -177,7 +179,7 @@ type URL struct {
 
 In a url `https://globomantics.com/api/products/123` the `Path` would be `/api/products/123`.
 
-# Middleware
+## Middleware
 
 The request pipeline looks something like this:
 
@@ -217,7 +219,7 @@ func main() {
 }
 ```
 
-# CORS (Cross Origin Resource Sharing)
+## CORS (Cross Origin Resource Sharing)
 
 CORS is designed to prevent cross-origin attacks.
 

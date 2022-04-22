@@ -21,13 +21,17 @@ func SetupRoutes(apiBasePath string) {
 }
 
 func productHandler(w http.ResponseWriter, r *http.Request) {
-	urlPathSegments := strings.Split(r.URL.Path, "products/")
+	urlPathSegments := strings.Split(r.URL.Path, fmt.Sprintf("%s/", productsBasePath))
 	productID, err := strconv.Atoi(urlPathSegments[len(urlPathSegments)-1])
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	product := getProduct(productID)
+	product, err := getProduct(productID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	if product == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -59,15 +63,16 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		_, err = addOrUpdateProduct(updatedProduct)
+		err = updateProduct(updatedProduct)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
 			return
 		}
 		w.WriteHeader(http.StatusOK)
 		return
 	case http.MethodDelete:
-		removeProduct(productID)
+		deleteProduct(productID)
 	case http.MethodOptions:
 		return
 	default:
@@ -78,7 +83,11 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 func productsHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		productList := getProductList()
+		productList, err := getProductList()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		productsJson, err := json.Marshal(productList)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -103,7 +112,7 @@ func productsHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		_, err = addOrUpdateProduct(newProduct)
+		_, err = insertProduct(newProduct)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
