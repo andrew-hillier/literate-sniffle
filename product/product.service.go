@@ -15,11 +15,13 @@ import (
 const productsBasePath = "products"
 
 func SetupRoutes(apiBasePath string) {
-	handleProducts := http.HandlerFunc(productsHandler)
-	handleProduct := http.HandlerFunc(productHandler)
+	productsHandler := http.HandlerFunc(productsHandler)
+	productHandler := http.HandlerFunc(productHandler)
+	reportHandler := http.HandlerFunc(handleProductReport)
 	http.Handle("/websocket", websocket.Handler(productSocket))
-	http.Handle(fmt.Sprintf("%s/%s", apiBasePath, productsBasePath), cors.Middleware(handleProducts))
-	http.Handle(fmt.Sprintf("%s/%s/", apiBasePath, productsBasePath), cors.Middleware(handleProduct))
+	http.Handle(fmt.Sprintf("%s/%s", apiBasePath, productsBasePath), cors.Middleware(productsHandler))
+	http.Handle(fmt.Sprintf("%s/%s/", apiBasePath, productsBasePath), cors.Middleware(productHandler))
+	http.Handle(fmt.Sprintf("%s/%s/reports", apiBasePath, productsBasePath), cors.Middleware(reportHandler))
 }
 
 func productHandler(w http.ResponseWriter, r *http.Request) {
